@@ -1,1 +1,5 @@
-manim-slides present Title Introduction InsecureChannel EncDec Cryptology OneWayFunction --fullscreen --hide-info-window
+manim-slides present \ 
+    Title Introduction InsecureChannel \
+    EncDec Cryptology OneWayFunction \
+    ECDLP DoubleAndAdd ECDLP2 ECDLP3 \
+    --fullscreen --hide-info-window

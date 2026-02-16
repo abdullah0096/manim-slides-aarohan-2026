@@ -1655,4 +1655,64 @@ class ECDLP3(Slide):
             r'Elliptic curve discrete logarithm problem').next_to(grp, DOWN, buff=1).scale(1.2)
         self.play(FadeIn(txt_ecdlp))
 
-        # nextScenePause(self)
+        self.next_slide()
+        self.play(FadeOut(img_whatsApp), FadeOut(txt_app1), FadeOut(img_UPI), FadeOut(txt_app2), FadeOut(img_bitEth), 
+                    FadeOut(txt_app3), FadeOut(txt_TLS), FadeOut(txt_Https))
+        
+        self.play(txt_ecdlp.animate.to_edge(DOWN))
+        self.next_slide()
+        self.play(txt_21.animate.next_to(txt_ecdlp, UP, buff=0.5))
+        self.next_slide()
+
+        left_base = np.array([-4.0, -3.1, 0])
+        right_base = np.array([4.0, -3.1, 0])
+        apex_point = np.array([0, 3.3, 0])
+        tri_outline = Polygon(left_base, right_base, apex_point, color=WHITE, stroke_width=4)
+
+        base_y = left_base[1]
+        apex_y = apex_point[1]
+        half_base = right_base[0]
+
+        def half_width_at(y):
+            return half_base * (apex_y - y) / (apex_y - base_y)
+
+        y_top_div = 1.0
+        y_mid_div = -1.3
+        top_half = half_width_at(y_top_div)
+        mid_half = half_width_at(y_mid_div)
+
+        top_divider = Line(
+            np.array([-top_half, y_top_div, 0]),
+            np.array([top_half, y_top_div, 0]),
+            color=BLUE,
+            stroke_width=3,
+        )
+        mid_divider = Line(
+            np.array([-mid_half, y_mid_div, 0]),
+            np.array([mid_half, y_mid_div, 0]),
+            color=BLUE,
+            stroke_width=3,
+        )
+
+        wa_apex = ImageMobject("images/WhatsApp.png").scale(0.7)
+        upi_apex = ImageMobject("images/upi2.png").scale(0.2)
+        biteth_apex = ImageMobject("images/bitEth.png").scale(0.095)
+
+        apps_top_row = Group(wa_apex).move_to(np.array([0, 2.2, 0]))
+        apps_bottom_row = Group(upi_apex, biteth_apex).arrange(RIGHT, buff=0.18).move_to(np.array([0, 1.45, 0]))
+        apps_icons = Group(apps_top_row, apps_bottom_row)
+
+        txt_ecdlp_target = Tex(r'Elliptic curve discrete \\ logarithm problem').scale(0.86).move_to(np.array([0, -2.35, 0]))
+        txt_21_target = Tex(r'Elliptic curve \\ cryptography').scale(1.0).move_to(np.array([0, -0.4, 0]))
+
+        self.play(
+            Transform(txt_ecdlp, txt_ecdlp_target),
+            Transform(txt_21, txt_21_target),
+        )
+        self.next_slide()
+        self.play(Create(tri_outline))
+        self.play(Create(top_divider), Create(mid_divider))
+        self.play(FadeIn(apps_icons))
+
+
+

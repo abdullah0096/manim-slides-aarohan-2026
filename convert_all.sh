@@ -1,1 +1,4 @@
-manim-slides convert Title Introduction InsecureChannel EncDec Cryptology OneWayFunction final_aarohan_slides.html
+manim-slides convert \
+    Title Introduction InsecureChannel EncDec Cryptology \
+    OneWayFunction ECDLP DoubleAndAdd ECDLP2 ECDLP3 \
+    final_aarohan_slides.html

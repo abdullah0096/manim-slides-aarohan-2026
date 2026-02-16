@@ -1,0 +1,1 @@
+manim-slides present Title Introduction InsecureChannel EncDec Cryptology OneWayFunction --fullscreen --hide-info-window

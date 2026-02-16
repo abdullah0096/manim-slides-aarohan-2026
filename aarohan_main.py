@@ -1,6 +1,8 @@
 from manim import *
 from manim_slides import Slide
+
 from cryptologySlide import *
+from utils import *
 
 DOTCOLOR = WHITE
 def plotDotTL(s):

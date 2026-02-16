@@ -15,6 +15,7 @@ Requires: manim >= 0.18, manim-slides
 from manim import *
 from manim_slides import Slide
 
+
 # ══════════════════════════════════════════════════════════════════════════════
 #  PALETTE — dark background, soft pastel nodes
 # ══════════════════════════════════════════════════════════════════════════════

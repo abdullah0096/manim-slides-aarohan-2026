@@ -3,6 +3,7 @@ from manim_slides import Slide
 
 from cryptologySlide import *
 from utils import *
+from piryamid import *
 
 DOTCOLOR = WHITE
 def plotDotTL(s):
@@ -1473,6 +1474,7 @@ class ECDLP(Slide):
 
         self.play(FadeIn(txt_da))
 
+# Aim : Double and add algorithm for scalar multiplication, complexity of ECDLP
 class DoubleAndAdd(Slide):
     def construct(self):
 
@@ -1567,6 +1569,7 @@ class DoubleAndAdd(Slide):
 
         # nextScenePause(self)
 
+# Aim : Show ECDLP, inverse problem is hard
 class ECDLP2(Slide):
     def construct(self):
 
@@ -1605,6 +1608,7 @@ class ECDLP2(Slide):
 
         # nextScenePause(self)
 
+# Aim : Triangle stack w.r.t. ECDLP
 class ECDLP3(Slide):
     def construct(self):
         txt_21 = Tex(r'Elliptic curve cryptography').shift(UL*3.5)
@@ -1714,5 +1718,386 @@ class ECDLP3(Slide):
         self.play(Create(top_divider), Create(mid_divider))
         self.play(FadeIn(apps_icons))
 
+# Aim : The big picture - pyrimid with everything
+class CryptoPyramid(Slide, MovingCameraScene):
 
+    def construct(self):
+        self.camera.background_color = BG
+        self.camera.frame.save_state()
 
+        # ── outer triangle shell ──
+        shell = Polygon(
+            APEX, BL, BR,
+            color=GOLD, stroke_width=3.0,
+            fill_color=BG, fill_opacity=1,
+        )
+        self.play(Create(shell), run_time=1.2)
+        self.next_slide()
+
+        self._tier_math()
+        self.next_slide()
+
+        self._tier_hardness()
+        self.next_slide()
+
+        self._tier_algorithms()
+        self.next_slide()
+
+        self._tier_protocols()
+        self.next_slide()
+
+        self._tier_applications()
+        self.next_slide()
+
+        # ── Final zoom out ──
+        self.play(Restore(self.camera.frame), run_time=1.4)
+        self.next_slide()
+
+    # ═══════════════════════════════════════════════════════
+    #  TIER 1 — MATHEMATICS   (Y0 → Y1)
+    #  Width at content ≈ 9.8 — lots of room
+    # ═══════════════════════════════════════════════════════
+    def _tier_math(self):
+        banner_y  = Y0 + 0.30
+        content_y = (Y0 + Y1) / 2 + 0.18  # −2.92
+
+        # Subtle warm tint for entire math zone (Y0→Y2)
+        math_bg = trapezoid(Y0, Y2, GOLD, opacity=0.05)
+
+        div = tier_div(Y1, sw=1.5, col=GOLD_DIM)  # dashed feel — sub-layer
+
+        lbl = t_gold("M A T H E M A T I C S", fs=38, w=BOLD) \
+                .move_to([0, banner_y, 0])
+
+        col_x = hw(content_y) * 2 * 0.28
+
+        sep_l = dash_vline(-col_x / 1.6, Y0 + 0.50, Y1 - 0.06)
+        sep_r = dash_vline( col_x / 1.6, Y0 + 0.50, Y1 - 0.06)
+
+        alg = vstack(
+            t_white("Abstract Algebra", 22),
+            t_small("Groups · Rings · Fields", 13), buf=0.09,
+        ).move_to([-col_x-0.3, content_y, 0])
+
+        num = vstack(
+            t_white("Number Theory", 22),
+            t_small("Primes · Modular Arith., Factor.", 13), buf=0.09,
+        ).move_to([0, content_y, 0])
+
+        ell = vstack(
+            t_white("Elliptic Curves", 22),
+            t_small("Finite Fields", 13), buf=0.09,
+        ).move_to([col_x+0.3, content_y, 0])
+
+        self.play(FadeIn(math_bg), run_time=0.4)
+        self.play(Create(div), run_time=0.6)
+        self.play(Write(lbl), run_time=0.8)
+        self.play(Create(sep_l), Create(sep_r), run_time=0.4)
+        self.play(
+            LaggedStart(FadeIn(alg), FadeIn(num), FadeIn(ell), lag_ratio=0.25),
+            run_time=0.9,
+        )
+
+    # ═══════════════════════════════════════════════════════
+    #  TIER 2 — HARDNESS (sub-layer of Mathematics) (Y1 → Y2)
+    #  Compact — abbreviations. Visual cue: same tint, dashed divider.
+    #  Width at content ≈ 8.3
+    # ═══════════════════════════════════════════════════════
+    def _tier_hardness(self):
+        tier_mid = (Y1 + Y2) / 2           # −1.90
+        self.play(
+            self.camera.frame.animate
+                .set_width(9.0)
+                .move_to([0, tier_mid, 0]),
+            run_time=0.9,
+        )
+
+        # Solid gold divider at Y2 — this is the real boundary
+        div = tier_div(Y2, sw=2.5)
+
+        # Bracket label connecting to math
+        bracket_l = Line(lp(Y1) + RIGHT*0.15, lp(Y1) + RIGHT*0.15 + UP*0.20,
+                         color=GOLD_DIM, stroke_width=1.5)
+        bracket_r = Line(rp(Y1) + LEFT*0.15, rp(Y1) + LEFT*0.15 + UP*0.20,
+                         color=GOLD_DIM, stroke_width=1.5)
+
+        title = t_small("Hardness Assumptions",
+                         fs=12, col=GOLD_DIM) \
+                    .move_to([0, Y1 + 0.14, 0])
+
+        content_y = tier_mid
+        avail = hw(content_y) * 2          # ≈ 8.3
+        col_x = avail * 0.25
+
+        sep_l = dash_vline(-col_x * 0.65, Y1 + 0.26, Y2 - 0.06)
+        sep_r = dash_vline( col_x * 0.65, Y1 + 0.26, Y2 - 0.06)
+
+        # Compact: abbreviations + emoji lock icons
+        ifp = vstack(
+            t_gold("IFP", fs=26, col=GOLD, w=BOLD),
+            t_small("RSA", fs=12), buf=0.08,
+        ).move_to([-col_x, content_y, 0])
+
+        lock1 = Text(LOCK_EMOJI, font_size=18).next_to(ifp, LEFT, buff=0.12)
+
+        ecdlp = vstack(
+            t_gold("ECDLP", fs=26, col=GOLD, w=BOLD),
+            t_small("ECC", fs=12), buf=0.08,
+        ).move_to([0, content_y, 0])
+
+        lock2 = Text(LOCK_EMOJI, font_size=18).next_to(ecdlp, LEFT, buff=0.12)
+
+        dlp = vstack(
+            t_gold("DLP", fs=26, col=GOLD, w=BOLD),
+            t_small("Diffie Hellman", fs=12), buf=0.08,
+        ).move_to([col_x, content_y, 0])
+
+        lock3 = Text(LOCK_EMOJI, font_size=18).next_to(dlp, LEFT, buff=0.12)
+
+        self.play(Create(div), run_time=0.5)
+        self.play(FadeIn(title), FadeIn(bracket_l), FadeIn(bracket_r), run_time=0.5)
+        self.play(Create(sep_l), Create(sep_r), run_time=0.4)
+        self.play(
+            LaggedStart(
+                AnimationGroup(FadeIn(ifp), FadeIn(lock1)),
+                AnimationGroup(FadeIn(ecdlp), FadeIn(lock2)),
+                AnimationGroup(FadeIn(dlp), FadeIn(lock3)),
+                lag_ratio=0.3,
+            ),
+            run_time=1.2,
+        )
+
+    # ═══════════════════════════════════════════════════════
+    #  TIER 3 — ALGORITHMS   (Y2 → Y5)
+    #  Banner at Y3→Y4.  Content below (Y2→Y3) and above (Y4→Y5).
+    #  Width at Y2 ≈ 7.6, at Y5 ≈ 4.9
+    # ═══════════════════════════════════════════════════════
+    def _tier_algorithms(self):
+        tier_mid = (Y2 + Y5) / 2           # −0.45
+        self.play(
+            self.camera.frame.animate
+                .set_width(8.5)
+                .move_to([0, tier_mid, 0]),
+            run_time=0.9,
+        )
+
+        # ── ALGORITHMS banner (Y3→Y4) — clipped to pyramid ──
+        ban_mid = (Y3 + Y4) / 2           # −0.50
+        # Use a polygon that exactly follows the pyramid edges
+        ban_bg = trapezoid(Y3, Y4, GOLD_DIM, opacity=0.15)
+        b_top = tier_div(Y4, sw=2.0)
+        b_bot = tier_div(Y3, sw=2.0)
+        lbl   = t_gold("A L G O R I T H M S", fs=28, w=BOLD) \
+                    .move_to([0, ban_mid, 0])
+
+        # Top divider at Y5
+        div_top = tier_div(Y5, sw=2.5)
+
+        # ── Content BELOW banner (Y2 → Y3): 3 sub-rows ──
+        below_h = Y3 - Y2                 # 0.60
+        rh      = below_h / 3.0           # 0.20 each
+        ry      = [Y2 + rh * (i + 0.5) for i in range(3)]
+
+        c_div_below = dash_vline(0, Y2 + 0.03, Y3 - 0.03)
+        sub1 = dim_line(lp(Y2 + rh),     rp(Y2 + rh), sw=0.7)
+        sub2 = dim_line(lp(Y2 + rh * 2), rp(Y2 + rh * 2), sw=0.7)
+
+        # Row 0 (bottom): wider area — use more width
+        rx0 = hw(ry[0]) * 0.45
+        key_l = t_white("Public Key", fs=11).move_to([-rx0, ry[0], 0])
+        key_r = t_white("Private Key", fs=11).move_to([rx0, ry[0], 0])
+
+        # Row 1 (middle)
+        rx1 = hw(ry[1]) * 0.45
+        sig   = t_white("Digital Sig.", fs=11).move_to([-rx1, ry[1], 0])
+        crypt = t_white("Cryptanalysis", fs=11).move_to([rx1, ry[1], 0])
+
+        # Row 2 (top)
+        rx2 = hw(ry[2]) * 0.42
+        zkp = t_white("ZKP", fs=11).move_to([-rx2, ry[2], 0])
+        pqc = t_white("PQC", fs=11).move_to([rx2, ry[2], 0])
+
+        # ── Content ABOVE banner (Y4 → Y5): 2-column ──
+        above_mid = (Y4 + Y5) / 2         # 0.15
+        c_div_above = dash_vline(0, Y4 + 0.04, Y5 - 0.04)
+
+        rxa = hw(above_mid) * 0.40
+        enc = vstack(
+            t_white("Encryption", fs=16),
+            t_small("AES · RSA · ECC", fs=12), buf=0.06,
+        ).move_to([-rxa, above_mid, 0])
+
+        key_icon = Text(KEY_EMOJI, font_size=14).next_to(enc, LEFT, buff=0.08)
+
+        hash_fn = vstack(
+            t_white("Hashing", fs=16),
+            t_small("SHA · Blake · MD5", fs=12), buf=0.06,
+        ).move_to([rxa, above_mid, 0])
+
+        shield = Text(SHIELD_EMJ, font_size=14).next_to(hash_fn, LEFT, buff=0.08)
+
+        # ── Animate ──
+        self.play(FadeIn(ban_bg), Create(b_bot), Create(b_top), run_time=0.5)
+        self.play(Write(lbl), Create(div_top), run_time=0.7)
+
+        # Below banner
+        self.play(Create(c_div_below), run_time=0.3)
+        self.play(Create(sub1), FadeIn(key_l), FadeIn(key_r), run_time=0.5)
+        self.play(Create(sub2), FadeIn(sig), FadeIn(crypt), run_time=0.5)
+        self.play(FadeIn(zkp), FadeIn(pqc), run_time=0.5)
+
+        # Above banner
+        self.play(Create(c_div_above), run_time=0.3)
+        self.play(
+            FadeIn(enc), FadeIn(key_icon),
+            FadeIn(hash_fn), FadeIn(shield),
+            run_time=0.7,
+        )
+
+    # ═══════════════════════════════════════════════════════
+    #  TIER 4 — PROTOCOLS   (Y5 → Y6)
+    #  Width at content ≈ 4.2 — three tight columns
+    # ═══════════════════════════════════════════════════════
+    def _tier_protocols(self):
+        tier_mid = (Y5 + Y6) / 2           # 1.05
+        self.play(
+            self.camera.frame.animate
+                .set_width(5.5)
+                .move_to([0, tier_mid, 0]),
+            run_time=0.9,
+        )
+
+        div = tier_div(Y6, sw=2.0)
+
+        title = t_small("P R O T O C O L S", fs=13, col=GOLD_DIM) \
+                    .move_to([0, Y5 + 0.10, 0])
+
+        content_y = tier_mid + 0.05
+        avail = hw(content_y) * 2          # ≈ 4.16
+        col_x = avail * 0.28
+
+        sep_l = dash_vline(-col_x * 0.55, Y5 + 0.22, Y6 - 0.06)
+        sep_r = dash_vline( col_x * 0.55, Y5 + 0.22, Y6 - 0.06)
+
+        tls = vstack(
+            t_white("TLS 1.3", fs=16),
+            t_small("HTTPS", fs=12), buf=0.07,
+        ).move_to([-col_x, content_y, 0])
+
+        signal = vstack(
+            t_white("Signal", fs=16),
+            t_small("E2E", fs=11), buf=0.07,
+        ).move_to([0, content_y, 0])
+
+        ssh = vstack(
+            t_white("SSH", fs=16),
+            t_small("PGP", fs=11), buf=0.07,
+        ).move_to([col_x, content_y, 0])
+
+        self.play(Create(div), run_time=0.5)
+        self.play(FadeIn(title), run_time=0.4)
+        self.play(Create(sep_l), Create(sep_r), run_time=0.4)
+        self.play(
+            LaggedStart(FadeIn(tls), FadeIn(signal), FadeIn(ssh), lag_ratio=0.25),
+            run_time=0.9,
+        )
+
+    # ═══════════════════════════════════════════════════════
+    #  TIER 5 — APPLICATIONS   (Y6 → Y7 apex)
+    #  Narrow — heavy zoom. Stacked vertically, 3 rows.
+    #  Width: 2.9 at bottom, 1.7 at mid, 0.7 near apex
+    # ═══════════════════════════════════════════════════════
+    def _tier_applications(self):
+        apex_mid = (Y6 + Y7) / 2           # 2.80
+        self.play(
+            self.camera.frame.animate
+                .set_width(3.5)
+                .move_to([0, apex_mid, 0]),
+            run_time=0.9,
+        )
+
+        apps_lbl = t_small("A P P L I C A T I O N S", fs=10, col=GOLD_DIM) \
+                       .move_to([0, Y6 + 0.10, 0])
+
+        # ── Bottom row (y ≈ 2.0, width ≈ 2.8) ──
+        row_bot_y = Y6 + 0.38
+        w_bot     = hw(row_bot_y) * 2      # ≈ 2.82
+
+        https_t = t_white("HTTPS", fs=13).move_to([-w_bot * 0.28, row_bot_y, 0])
+        upi_t   = t_gold("UPI", fs=13, col=GOLD_BRIGHT) \
+                      .move_to([0, row_bot_y, 0])
+        more_t  = t_small("& more...", fs=10) \
+                      .move_to([w_bot * 0.28, row_bot_y, 0])
+
+        d_bot = dim_line(lp(row_bot_y + 0.22), rp(row_bot_y + 0.22), sw=0.8)
+
+        # ── Middle row (y ≈ 2.55, width ≈ 2.0) ──
+        row_mid_y = 2.55
+        w_mid     = hw(row_mid_y) * 2      # ≈ 2.04
+
+        wa_t = t_gold("WhatsApp", fs=12, col=GOLD_BRIGHT) \
+                   .move_to([-w_mid * 0.25, row_mid_y, 0])
+        eth_gem = self._eth_gem().scale(0.16) \
+                      .move_to([w_mid * 0.25, row_mid_y + 0.04, 0])
+        eth_lbl = t_small("ETH", fs=9) \
+                      .next_to(eth_gem, DOWN, buff=0.03)
+
+        d_mid = dim_line(lp(row_mid_y + 0.28), rp(row_mid_y + 0.28), sw=0.8)
+
+        # ── Top: Bitcoin near apex (y ≈ 3.30, width ≈ 1.0) ──
+        btc_y  = 3.25
+        circle = Circle(
+            radius=0.14, stroke_width=1.5,
+            color=BITCOIN_ORG, fill_color=BITCOIN_ORG, fill_opacity=1,
+        ).move_to([0, btc_y + 0.16, 0])
+        sym = Text("₿", font="GFS Complutum", font_size=11, color=WHITE) \
+                .move_to(circle.get_center())
+        btc_lbl = t_white("Crypto. Curr.", fs=10) \
+                      .next_to(circle, DOWN, buff=0.04)
+
+        # ── Animate bottom → top for fun reveal ──
+        self.play(FadeIn(apps_lbl), run_time=0.3)
+        self.play(
+            LaggedStart(FadeIn(https_t), FadeIn(upi_t), FadeIn(more_t), lag_ratio=0.15),
+            run_time=0.6,
+        )
+        self.play(Create(d_bot), run_time=0.25)
+        self.play(FadeIn(wa_t), FadeIn(eth_gem), FadeIn(eth_lbl), run_time=0.6)
+        self.play(Create(d_mid), run_time=0.25)
+
+        # Fun: Bitcoin drops from above and bounces
+        circle.shift(UP * 1.5)
+        sym.shift(UP * 1.5)
+        self.play(
+            circle.animate.shift(DOWN * 1.5),
+            sym.animate.shift(DOWN * 1.5),
+            rate_func=rate_functions.ease_out_bounce,
+            run_time=1.0,
+        )
+        self.play(Write(btc_lbl), run_time=0.4)
+
+    # ─────────────────────────────────────────────────────────
+    #  Utility — Ethereum diamond gem
+    # ─────────────────────────────────────────────────────────
+    def _eth_gem(self):
+        O = np.array
+        top = Polygon(
+            O([0,  0.48, 0]), O([ 0.38, 0, 0]), O([-0.38, 0, 0]),
+            fill_color=ETH_SILVER, fill_opacity=1, stroke_width=0,
+        )
+        bot = Polygon(
+            O([0, -0.48, 0]), O([ 0.38, 0, 0]), O([-0.38, 0, 0]),
+            fill_color="#767676", fill_opacity=1, stroke_width=0,
+        )
+        hi = Polygon(
+            O([0,  0.48, 0]), O([0.38, 0, 0]), O([0, 0.12, 0]),
+            fill_color="#E0E0E0", fill_opacity=1, stroke_width=0,
+        )
+        return VGroup(top, bot, hi)
+
+# Aim : Quantum computers : Harvest now decrypt later
+class QuantumThreat(Slide):
+    def construct(self):
+        pass
+
+    

@@ -1,0 +1,105 @@
+sudo apt update
+sudo apt install -y \
+  python3 python3-pip python3-venv \
+  ffmpeg \
+  libcairo2-dev \
+  libpango1.0-dev \
+  libpangocairo-1.0-0 \
+  pkg-config \
+  texlive-latex-base \
+  texlive-latex-extra \
+  texlive-fonts-extra \
+  texlive-latex-recommended \
+  texlive-science \
+  sox
+
+
+python3 -m venv manim-env
+source manim-env/bin/activate
+
+
+(manim-env) user@kali:~
+
+
+pip install --upgrade pip
+pip install manim
+
+
+manim --version
+
+
+pip install manim-slides
+
+
+manim-slides --help
+
+pip install PySide6
+
+#.dvi to svg converter for manim-slides
+sudo apt install -y dvisvgm
+
+
+pip install av==10.0.0
+
+
+sudo apt install -y \
+  libavformat-dev \
+  libavcodec-dev \
+  libavdevice-dev \
+  libavutil-dev \
+  libavfilter-dev \
+  libswscale-dev \
+  libswresample-dev
+
+---
+
+sudo apt update
+sudo apt install -y \
+  ffmpeg \
+  dvisvgm \
+  texlive-latex-base \
+  texlive-latex-extra \
+  texlive-fonts-recommended \
+  texlive-fonts-extra \
+  libcairo2-dev \
+  pkg-config
+
+
+pyenv local 3.10.14
+
+---
+
+New setup from scratch:
+
+rm -rf manim-env
+python3 -m venv manim-env
+source manim-env/bin/activate
+
+pip install --upgrade pip wheel setuptools
+pip install -r requirements.txt
+
+
+
+To remove flikering between next_slide()
+pip install manim-slides[pyside6]
+
+
+---
+install Rajdhani font
+
+sudo apt install fonts-rajdhani
+
+OR
+
+wget https://github.com/google/fonts/raw/main/ofl/rajdhani/Rajdhani-Regular.ttf
+mkdir -p ~/.local/share/fonts
+mv Rajdhani-Regular.ttf ~/.local/share/fonts/
+fc-cache -f -v
+
+verify the installation
+
+fc-list | grep -i rajdhani
+
+
+---
+
